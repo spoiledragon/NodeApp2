@@ -14,6 +14,7 @@ import {Input, Icon, Button} from 'react-native-elements';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import CustomInput from '../component/CustomInput';
+import Data from '../component/Data';
 
 const Login = ({navigation}) => {
   const [codeValue, setcodeValue] = useState('');
@@ -27,11 +28,11 @@ const Login = ({navigation}) => {
   };
 
   //Funciones Mas complejas
-  const saveData = () => {
+  const saveData = async() => {
     //solo la mandare a llamar cuando logeen
     if (codeValue) {
-      AsyncStorage.setItem('UserKey', codeValue);
-      AsyncStorage.setItem('UserPassword', passwordValue);
+      const jsonValue = JSON.stringify(codeValue);
+      await AsyncStorage.setItem('@UserKeys', jsonValue);
       console.log('Datos Almacenados', codeValue);
     } else {
       alert('please fill data');
@@ -40,14 +41,7 @@ const Login = ({navigation}) => {
 
   const getData = () => {
     if (codeValue) {
-      AsyncStorage.getItem('UserKey').then(valuecode => {
-        setcodeValue(valuecode);
-        console.log(valuecode);
-      });
-      AsyncStorage.getItem('UserPassword').then(valuepass => {
-        setpasswordValue(valuepass);
-        console.log(valuepass);
-      });
+
     }
   };
 
@@ -61,8 +55,8 @@ const Login = ({navigation}) => {
         if (xhttp.responseText == 0) {
           //usuario autentificadoy
           saveData();
-          setcodeValue("");
-          setpasswordValue("");
+          setcodeValue('');
+          setpasswordValue('');
           navigation.navigate('Drawer', {pasarCode: codeValue});
         }
         if (xhttp.responseText == 1) {
@@ -154,8 +148,6 @@ const Login = ({navigation}) => {
               getData();
             }}
           />
-          
-
         </View>
       </ImageBackground>
     </View>
@@ -202,7 +194,7 @@ const styles = StyleSheet.create({
   },
   inputtext: {
     flex: 1,
-    color:"white",
+    color: 'white',
   },
   icon: {
     padding: 10,

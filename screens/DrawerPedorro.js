@@ -12,7 +12,6 @@ import {
   Dimensions,
 } from 'react-native';
 import {Input, Icon, Button, Picker, Image} from 'react-native-elements';
-import Btn from '../component/Btn';
 
 export default class Main extends Component {
   constructor(props) {
@@ -20,12 +19,13 @@ export default class Main extends Component {
     this.state = {
       num_participantes: 0,
       open: false,
+      NombreP: '',
+      centroP: '',
+      IdP: '',
     };
     
   }
-
-
-
+ 
   //drawwer!!
   toggleOpen = () => {
     this.setState({open: !this.state.open});
@@ -43,46 +43,20 @@ export default class Main extends Component {
               uri: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/a6c5b871-65d8-4396-a2eb-06146905a4b4/deypz5r-9714fd9c-a859-49c8-9303-aa3061a601b2.png/v1/fill/w_1024,h_512,q_80,strp/spoiled_by_dragoneitorgb_deypz5r-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NTEyIiwicGF0aCI6IlwvZlwvYTZjNWI4NzEtNjVkOC00Mzk2LWEyZWItMDYxNDY5MDVhNGI0XC9kZXlwejVyLTk3MTRmZDljLWE4NTktNDljOC05MzAzLWFhMzA2MWE2MDFiMi5wbmciLCJ3aWR0aCI6Ijw9MTAyNCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.jwBu-zboveYJavFY5yF3bTtguiX1nGVDsvOqTHGpUds',
             }}
           />
-          <Text style={styles.Info}>N O M B R E</Text>
+          <Text style={styles.Info}>{this.state.NombreP}</Text>
+          <Text style={styles.Info}>{this.state.IdP}</Text>
+          <Text style={styles.Info}>{this.state.centroP}</Text>
+          <Text style={styles.Info}>{this.state.num_participantes}</Text>
         </View>
-        <View>
-          <Text style={styles.Info}>Carrera</Text>
-        </View>
+        
       </TouchableOpacity>
     );
+    
   };
   //fin del drawer!!
 
-  
-
   render() {
-    var done = false;
-
-    const update = numero => {
-      this.setState({num_participantes: numero});
-    };
-    const btn = () => {
-      if (!done) {
-        console.log('Hecho');
-        done = true;
-      } else {
-        console.log('NO Hecho');
-      }
-      var xhttp = new XMLHttpRequest();
-      xhttp.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-          console.log('Pressed');
-          console.log(xhttp.responseText);
-
-          if (xhttp.responseText > 0) {
-            update(xhttp.responseText);
-          }
-        }
-      };
-      xhttp.open('GET', 'https://spoiledragon.000webhostapp.com/Cont.php');
-      xhttp.send();
-    };
-
+    
     //PANTALLA PRINCIPAL QUE SI SE VE
     return (
       <View style={styles.container}>
@@ -114,7 +88,6 @@ export default class Main extends Component {
             marginHorizontal: 0,
             marginVertical: 10,
           }}
-          onPress={btn}
         />
 
         <MenuDrawer
@@ -133,11 +106,36 @@ export default class Main extends Component {
     );
   }
 
+  TraeDatos = async () => {
+    let _this = this;
+    const jsonValue = await AsyncStorage.getItem('@UserKeys');
+    var datau = JSON.parse(jsonValue);
+    console.log('se ha guardado', datau);
+    //conexcion al servidor
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+      if (this.readyState == 4 && this.status == 200) {
+        var Datos = xhttp.responseText;
+        console.log(Datos);
+        var arr = Datos.split(',');
 
-  
+        _this.setState({NombreP: arr[0]});
+        _this.setState({IdP: arr[1]});
+        _this.setState({centroP: arr[0]});
+        _this.setState({num_participantes: arr[3]});
+      }
+    };
+    xhttp.open(
+      'GET',
+      'https://spoiledragon.000webhostapp.com/Cont.php?cod=' + datau,
+    );
+    xhttp.send();
+  };
+
+  componentDidMount() {
+    this.TraeDatos();
+  }
 }
-
-
 
 const styles = StyleSheet.create({
   Info: {
@@ -152,7 +150,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyItems: 'center',
     alignItems: 'center',
-   
+
     backgroundColor: 'black',
   },
   animatedBox: {

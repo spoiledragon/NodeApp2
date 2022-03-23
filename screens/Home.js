@@ -2,6 +2,7 @@ import {View, Text,StyleSheet,Dimensions,} from 'react-native';
 import React from 'react';
 import Btn from '../component/Btn';
 import {createDrawerNavigator} from 'react-navigation'
+
 const Home = ({navigation, route}) => {
 
 
