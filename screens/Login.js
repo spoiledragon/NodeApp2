@@ -44,6 +44,7 @@ const Login = ({navigation}) => {
 
     }
   };
+  
 
   const btnLogin = () => {
     var xhttp = new XMLHttpRequest();
@@ -92,6 +93,7 @@ const Login = ({navigation}) => {
     );
     xhttp.send();
   };
+ 
 
   //lo que se ve
   return (
@@ -151,7 +153,10 @@ const Login = ({navigation}) => {
         </View>
       </ImageBackground>
     </View>
+    
   );
+
+  
 };
 const styles = StyleSheet.create({
   text: {

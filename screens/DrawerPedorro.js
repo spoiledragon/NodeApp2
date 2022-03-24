@@ -1,6 +1,5 @@
 import React, {Component, useState} from 'react';
 import {NavigationContext} from '@react-navigation/native';
-import {TouchableOpacity} from 'react-native';
 import {Avatar, Tile} from 'react-native-elements';
 import MenuDrawer from 'react-native-side-drawer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,8 +9,12 @@ import {
   ImageBackground,
   StyleSheet,
   Dimensions,
+  FlatList,
+  Modal,
+  TouchableOpacity,
+  TextInput,
 } from 'react-native';
-import {Input, Icon, Button, Picker, Image} from 'react-native-elements';
+import {Input, Icon, Button, Picker, Image, Card} from 'react-native-elements';
 
 export default class Main extends Component {
   constructor(props) {
@@ -23,9 +26,8 @@ export default class Main extends Component {
       centroP: '',
       IdP: '',
     };
-    
   }
- 
+
   //drawwer!!
   toggleOpen = () => {
     this.setState({open: !this.state.open});
@@ -48,48 +50,50 @@ export default class Main extends Component {
           <Text style={styles.Info}>{this.state.centroP}</Text>
           <Text style={styles.Info}>{this.state.num_participantes}</Text>
         </View>
-        
       </TouchableOpacity>
     );
-    
   };
   //fin del drawer!!
 
+  //PANTALLA PRINCIPAL QUE SI SE VE
   render() {
-    
-    //PANTALLA PRINCIPAL QUE SI SE VE
+    const users = [
+      {
+        name: 'Spoiled',
+        avatar: 'https://i.blogs.es/66b2a4/photo-1511367461989-f85a21fda167/1366_2000.jpeg',
+      },
+      {
+        name: 'Krystal',
+        avatar:
+          'https://scontent.fgdl10-1.fna.fbcdn.net/v/t39.30808-6/277169460_627688334989775_1979254251867421709_n.jpg?stp=dst-jpg_p552x414&_nc_cat=109&ccb=1-5&_nc_sid=730e14&_nc_eui2=AeHBuKE0eIeEVITpJDyOcwtm5P6u3dYsu_Hk_q7d1iy78WbLjsqqfrpbZXx5XXMQYmGtxOvJ2GCXTLqMY0kwK0ft&_nc_ohc=QTfJEhZ8ZiAAX_3iMBX&tn=LwYmHrA9cqHQm4E9&_nc_ht=scontent.fgdl10-1.fna&oh=00_AT_yYv0k5-Z_tfG_lNO_FVOSezWNKW4xGDQO-hd49ngg7w&oe=62429171',
+      },
+      {
+        name: 'Marco',
+        avatar: 'https://i.pinimg.com/550x/72/df/30/72df30b8b200848e492625ef95dd2e50.jpg',
+      },
+    ];
+
     return (
       <View style={styles.container}>
+      
         <Tile
           imageSrc={require('../Imagenes/background.png')}
           title="Participantes"
           featured
           caption={this.state.num_participantes}
         />
-        <Button
-          title="Refresh"
-          icon={{
-            name: 'fire',
-            type: 'font-awesome',
-            size: 15,
-            color: 'white',
-          }}
-          iconRight
-          iconContainerStyle={{marginLeft: 10}}
-          titleStyle={{fontWeight: '700'}}
-          buttonStyle={{
-            backgroundColor: 'black',
-            borderColor: 'transparent',
-            borderWidth: 0,
-            borderRadius: 30,
-          }}
-          containerStyle={{
-            width: 500,
-            marginHorizontal: 0,
-            marginVertical: 10,
-          }}
-        />
 
+        <Card containerStyle={styles.containerCard}>
+          <Card.Title style={styles.cardtitle}>Top 3</Card.Title>
+          {users.map((u, i) => {
+            return (
+              <View key={i} style={styles.user}>
+                <Avatar size={64} rounded source={{uri: u.avatar}} />
+                <Text style={styles.Infocard}>{u.name}</Text>
+              </View>
+            );
+          })}
+        </Card>
         <MenuDrawer
           open={this.state.open}
           position={'right'}
@@ -105,6 +109,7 @@ export default class Main extends Component {
       </View>
     );
   }
+  // Funciones
 
   TraeDatos = async () => {
     let _this = this;
@@ -118,7 +123,6 @@ export default class Main extends Component {
         var Datos = xhttp.responseText;
         console.log(Datos);
         var arr = Datos.split(',');
-
         _this.setState({NombreP: arr[0]});
         _this.setState({IdP: arr[1]});
         _this.setState({centroP: arr[0]});
@@ -136,22 +140,21 @@ export default class Main extends Component {
     this.TraeDatos();
   }
 }
-
+//CSS
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyItems: 'center',
+    alignItems: 'center',
+    backgroundColor: 'black',
+  },
   Info: {
     marginTop: 10,
     textAlign: 'left',
     fontSize: 20,
     fontWeight: '500',
     color: 'white',
-  },
-  container: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyItems: 'center',
-    alignItems: 'center',
-
-    backgroundColor: 'black',
   },
   animatedBox: {
     flex: 1,
@@ -160,13 +163,26 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   body: {
-    flex: 1,
-    marginTop: 50,
+    marginTop: 10,
     alignItems: 'center',
   },
-  avatar: {
-    marginTop: 20,
+  user: {
+    flexDirection: 'row',
     marginBottom: 20,
-    alignItems: 'center',
+  },
+  containerCard: {
+    width: 350,
+    backgroundColor: 'black',
+    borderColor:"black"
+  },
+  cardtitle: {
+    fontSize: 40,
+    color: 'white',
+    textAlign: 'center',
+    fontStyle: 'italic',
+  },
+  Infocard: {
+    color: 'white',
+    padding: 20,
   },
 });

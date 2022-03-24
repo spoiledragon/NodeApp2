@@ -1,18 +1,16 @@
 import {View, Text,StyleSheet,Dimensions,} from 'react-native';
 import React from 'react';
 import Btn from '../component/Btn';
-import {createDrawerNavigator} from 'react-navigation'
+import Main from './DrawerPedorro';
+import MenuDrawer from 'react-native-side-drawer';
 
-const Home = ({navigation, route}) => {
+const Home = ({navigation}) => {
 
 
 
   //lo que vemos
   //const {pasarCode} = route.params;
   return (
-    
-
-
       <Text style={styles.texto}>Hola </Text>
     
   );
