@@ -25,6 +25,9 @@ export default class Main extends Component {
       NombreP: '',
       centroP: '',
       IdP: '',
+      Avatar:
+        'https://i.pinimg.com/736x/cd/aa/03/cdaa035a2e82532857070e0007d977a6.jpg',
+      km: 0,
     };
   }
 
@@ -42,9 +45,11 @@ export default class Main extends Component {
             size="xlarge"
             rounded
             source={{
-              uri: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/a6c5b871-65d8-4396-a2eb-06146905a4b4/deypz5r-9714fd9c-a859-49c8-9303-aa3061a601b2.png/v1/fill/w_1024,h_512,q_80,strp/spoiled_by_dragoneitorgb_deypz5r-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NTEyIiwicGF0aCI6IlwvZlwvYTZjNWI4NzEtNjVkOC00Mzk2LWEyZWItMDYxNDY5MDVhNGI0XC9kZXlwejVyLTk3MTRmZDljLWE4NTktNDljOC05MzAzLWFhMzA2MWE2MDFiMi5wbmciLCJ3aWR0aCI6Ijw9MTAyNCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.jwBu-zboveYJavFY5yF3bTtguiX1nGVDsvOqTHGpUds',
+              uri: this.state.Avatar,
             }}
           />
+        </View>
+        <View>
           <Text style={styles.Info}>{this.state.NombreP}</Text>
           <Text style={styles.Info}>{this.state.IdP}</Text>
           <Text style={styles.Info}>{this.state.centroP}</Text>
@@ -59,53 +64,66 @@ export default class Main extends Component {
   render() {
     const users = [
       {
-        name: 'Spoiled',
-        avatar: 'https://i.blogs.es/66b2a4/photo-1511367461989-f85a21fda167/1366_2000.jpeg',
+        name: 'Karlo',
+        avatar:
+        'https://i.pinimg.com/736x/cd/aa/03/cdaa035a2e82532857070e0007d977a6.jpg',
+        km: 5.4,
       },
       {
         name: 'Krystal',
         avatar:
           'https://scontent.fgdl10-1.fna.fbcdn.net/v/t39.30808-6/277169460_627688334989775_1979254251867421709_n.jpg?stp=dst-jpg_p552x414&_nc_cat=109&ccb=1-5&_nc_sid=730e14&_nc_eui2=AeHBuKE0eIeEVITpJDyOcwtm5P6u3dYsu_Hk_q7d1iy78WbLjsqqfrpbZXx5XXMQYmGtxOvJ2GCXTLqMY0kwK0ft&_nc_ohc=QTfJEhZ8ZiAAX_3iMBX&tn=LwYmHrA9cqHQm4E9&_nc_ht=scontent.fgdl10-1.fna&oh=00_AT_yYv0k5-Z_tfG_lNO_FVOSezWNKW4xGDQO-hd49ngg7w&oe=62429171',
+        km: 2.4,
       },
       {
         name: 'Marco',
-        avatar: 'https://i.pinimg.com/550x/72/df/30/72df30b8b200848e492625ef95dd2e50.jpg',
+        avatar:
+          'https://i.pinimg.com/550x/72/df/30/72df30b8b200848e492625ef95dd2e50.jpg',
+        km: 1.2,
       },
     ];
 
     return (
       <View style={styles.container}>
-      
-        <Tile
-          imageSrc={require('../Imagenes/background.png')}
-          title="Participantes"
-          featured
-          caption={this.state.num_participantes}
-        />
-
-        <Card containerStyle={styles.containerCard}>
-          <Card.Title style={styles.cardtitle}>Top 3</Card.Title>
-          {users.map((u, i) => {
-            return (
-              <View key={i} style={styles.user}>
-                <Avatar size={64} rounded source={{uri: u.avatar}} />
-                <Text style={styles.Infocard}>{u.name}</Text>
-              </View>
-            );
-          })}
-        </Card>
         <MenuDrawer
           open={this.state.open}
-          position={'right'}
+          position={'left'}
           drawerContent={this.drawerContent()}
-          drawerPercentage={70}
+          drawerPercentage={50}
           animationTime={250}
           overlay={true}
           opacity={0.4}>
+          <Tile
+            imageSrc={require('../Imagenes/background.png')}
+            title="Participantes"
+            featured
+            caption={this.state.num_participantes}
+          />
           <TouchableOpacity onPress={this.toggleOpen} style={styles.body}>
-            <Text style={styles.Info}>Open</Text>
+            <Icon name="navicon" type="evilicon" color="white" />
           </TouchableOpacity>
+
+          <Card containerStyle={styles.containerCard}>
+            <Card.Title style={styles.cardtitle}>Leaderboard</Card.Title>
+          </Card>
+
+          {users.map((u, i) => {
+            return (
+              <View key={i} style={styles.user}>
+                <Avatar
+                  size={69}
+                  rounded
+                  source={{uri: u.avatar}}
+                  containerStyle={styles.midAvatar}
+                />
+                <Text style={styles.Infocard}>{u.name}</Text>
+                <Text style={styles.Infocard}>Km: {u.km}</Text>
+                <Text style={styles.contador}>{i + 1}</Text>
+              </View>
+            );
+          })}
         </MenuDrawer>
+  
       </View>
     );
   }
@@ -145,7 +163,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    justifyItems: 'center',
+    alignContent: 'center',
     alignItems: 'center',
     backgroundColor: 'black',
   },
@@ -164,25 +182,60 @@ const styles = StyleSheet.create({
   },
   body: {
     marginTop: 10,
-    alignItems: 'center',
+    marginRight: 350,
+    alignContent: 'space-between',
   },
   user: {
     flexDirection: 'row',
-    marginBottom: 20,
+    borderBottomColor:"#eda137",
+    borderWidth: 1,
+    marginTop: 10,
+    height: 64,
+    alignItems: 'center',
+    alignContent:"center",
+
   },
   containerCard: {
-    width: 350,
+    width: 360,
     backgroundColor: 'black',
-    borderColor:"black"
+    borderColor: 'black',
+    borderWidth: 1,
+    borderRadius: 25,
   },
   cardtitle: {
     fontSize: 40,
-    color: 'white',
+    color: '#fff',
     textAlign: 'center',
     fontStyle: 'italic',
   },
   Infocard: {
-    color: 'white',
+    color: '#fff',
+    fontSize: 15,
     padding: 20,
+    letterSpacing: 1,
   },
+  contador: {
+    fontSize: 40,
+    marginLeft: 80,
+    color: '#eda137',
+  },
+  bottom: {
+    flexDirection: 'row',
+    borderColor: 'white',
+    borderWidth: 0.1,
+    width: 360,
+    height: 60,
+    alignItems: 'center',
+    backgroundColor: 'black',
+    borderRadius: 25,
+  },
+  avatar: {
+    alignContent: 'center',
+    alignItems: 'center',
+  },
+  topper: {
+    width: 50,
+    height: 50,
+  },
+
 });
