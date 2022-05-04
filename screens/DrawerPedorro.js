@@ -28,6 +28,7 @@ export default class Main extends Component {
       Avatar:
         'https://i.pinimg.com/736x/cd/aa/03/cdaa035a2e82532857070e0007d977a6.jpg',
       km: 0,
+      Corredores: [],
     };
   }
 
@@ -42,7 +43,7 @@ export default class Main extends Component {
       <TouchableOpacity onPress={this.toggleOpen} style={styles.animatedBox}>
         <View style={styles.avatar}>
           <Avatar
-            size="xlarge"
+            size="large"
             rounded
             source={{
               uri: this.state.Avatar,
@@ -66,7 +67,7 @@ export default class Main extends Component {
       {
         name: 'Karlo',
         avatar:
-        'https://i.pinimg.com/736x/cd/aa/03/cdaa035a2e82532857070e0007d977a6.jpg',
+          'https://i.pinimg.com/736x/cd/aa/03/cdaa035a2e82532857070e0007d977a6.jpg',
         km: 5.4,
       },
       {
@@ -82,6 +83,7 @@ export default class Main extends Component {
         km: 1.2,
       },
     ];
+    //console.log("Los corredores son Fin",users[0]);
 
     return (
       <View style={styles.container}>
@@ -93,12 +95,16 @@ export default class Main extends Component {
           animationTime={250}
           overlay={true}
           opacity={0.4}>
+       
           <Tile
             imageSrc={require('../Imagenes/background.png')}
             title="Participantes"
             featured
             caption={this.state.num_participantes}
+            height={200}
           />
+            
+           
           <TouchableOpacity onPress={this.toggleOpen} style={styles.body}>
             <Icon name="navicon" type="evilicon" color="white" />
           </TouchableOpacity>
@@ -107,23 +113,25 @@ export default class Main extends Component {
             <Card.Title style={styles.cardtitle}>Leaderboard</Card.Title>
           </Card>
 
-          {users.map((u, i) => {
-            return (
-              <View key={i} style={styles.user}>
-                <Avatar
-                  size={69}
-                  rounded
-                  source={{uri: u.avatar}}
-                  containerStyle={styles.midAvatar}
-                />
-                <Text style={styles.Infocard}>{u.name}</Text>
-                <Text style={styles.Infocard}>Km: {u.km}</Text>
-                <Text style={styles.contador}>{i + 1}</Text>
-              </View>
-            );
+          {this.state.Corredores.map((u, i) => {
+            if (i < 3) {
+              return (
+                <View key={i} style={styles.user}>
+                  <Avatar
+                    size={69}
+                    rounded
+                    source={{uri: u.Photo}}
+                    containerStyle={styles.midAvatar}
+                  />
+                  <Text style={styles.Infocard}>{u.Code}</Text>
+                  <Text style={styles.Infocard}>Km: {u.Distance}</Text>
+                  <Text style={styles.Infocard}>Hrs: {u.Time}</Text>
+                  <Text style={styles.contador}>{i + 1}</Text>
+                </View>
+              );
+            }
           })}
         </MenuDrawer>
-  
       </View>
     );
   }
@@ -131,31 +139,64 @@ export default class Main extends Component {
 
   TraeDatos = async () => {
     let _this = this;
-    const jsonValue = await AsyncStorage.getItem('@UserKeys');
-    var datau = JSON.parse(jsonValue);
-    console.log('se ha guardado', datau);
+
+    try {
+      AsyncStorage.getItem('@UserKeys').then(value => {
+        if (value != null) {
+          let user = JSON.parse(value);
+          //conexcion al servidor
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+              var Datos = xhttp.responseText;
+              //console.log(Datos);
+              var arr = Datos.split(',');
+              _this.setState({NombreP: arr[0]});
+              _this.setState({IdP: arr[1]});
+              _this.setState({centroP: arr[0]});
+              _this.setState({num_participantes: arr[3]});
+              _this.setState({Avatar: arr[4]});
+            }
+          };
+
+          xhttp.open(
+            'GET',
+            'https://spoiledragon.000webhostapp.com/Cont.php?cod=' + user.Code,
+          );
+          xhttp.send();
+        }
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  /* FUNCION 2*/
+  /* ///////////////////////////////////////////////// 2*/
+  /*SELECT codigo, distancia, tiempo,(distancia/tiempo) as puntos FROM `EstadisticasC`  
+ORDER BY `puntos`  DESC */
+
+  //AQUI
+  TraeDatos2 = () => {
+    let _this = this;
     //conexcion al servidor
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function () {
+    var xhttp2 = new XMLHttpRequest();
+    xhttp2.onreadystatechange = function () {
       if (this.readyState == 4 && this.status == 200) {
-        var Datos = xhttp.responseText;
-        console.log(Datos);
-        var arr = Datos.split(',');
-        _this.setState({NombreP: arr[0]});
-        _this.setState({IdP: arr[1]});
-        _this.setState({centroP: arr[0]});
-        _this.setState({num_participantes: arr[3]});
+        console.log('entra');
+        _this.setState({Corredores: JSON.parse(xhttp2.responseText)});
       }
     };
-    xhttp.open(
-      'GET',
-      'https://spoiledragon.000webhostapp.com/Cont.php?cod=' + datau,
-    );
-    xhttp.send();
+    xhttp2.open('GET', 'https://spoiledragon.000webhostapp.com/Table.php');
+    xhttp2.send();
   };
+
+  /* ///////////////////////////////////////////////// 2*/
+  /* FIN DEFUNCION 2*/
 
   componentDidMount() {
     this.TraeDatos();
+    this.TraeDatos2();
   }
 }
 //CSS
@@ -187,13 +228,12 @@ const styles = StyleSheet.create({
   },
   user: {
     flexDirection: 'row',
-    borderBottomColor:"#eda137",
-    borderWidth: 1,
+    borderBottomColor: '#eda137',
+    borderWidth: 2,
     marginTop: 10,
     height: 64,
     alignItems: 'center',
-    alignContent:"center",
-
+    alignContent: "flex-start",
   },
   containerCard: {
     width: 360,
@@ -211,12 +251,12 @@ const styles = StyleSheet.create({
   Infocard: {
     color: '#fff',
     fontSize: 15,
-    padding: 20,
+   marginHorizontal:20,
     letterSpacing: 1,
   },
   contador: {
     fontSize: 40,
-    marginLeft: 80,
+    textAlign:"right",
     color: '#eda137',
   },
   bottom: {
@@ -237,5 +277,4 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
   },
-
 });

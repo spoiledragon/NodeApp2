@@ -196,7 +196,6 @@ const SinUp = ({navigation}) => {
 
           <TextInput
             style={styles.text}
-
             placeholder="Mail"
             keyboardType="email-address"
             placeholderTextColor="white"
@@ -218,6 +217,7 @@ const SinUp = ({navigation}) => {
         <View style={styles.inputContainer}>
           <Icon name="md-time" color="white" size={15} style={styles.icon} />
           <TextInput
+          
             style={styles.text}
             placeholder="Grade"
             placeholderTextColor="white"
@@ -241,10 +241,12 @@ const SinUp = ({navigation}) => {
 const styles = StyleSheet.create({
   text: {
     flex: 1,
+    color:"#FFF"
   },
   inputContainer: {
     flexDirection: 'row',
     alignContent: 'center',
+    color:"#FFF",
     margin: 5,
     height: 60,
     borderWidth: 2,
@@ -255,7 +257,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   input: {
-    color: 'white',
+    color: '#FFF',
   },
   container: {
     flexDirection: 'column',

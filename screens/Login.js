@@ -8,7 +8,7 @@ import {
   Image,
   Dimensions,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {Component, useEffect, useState} from 'react';
 import Btn from '../component/Btn';
 import {Input, Icon, Button} from 'react-native-elements';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -23,28 +23,43 @@ const Login = ({navigation}) => {
 
   //Funciones
 
+  useEffect(() => {
+    getData();
+  }, []);
+
   const btnRegister = () => {
     navigation.navigate('SingUp');
   };
 
   //Funciones Mas complejas
-  const saveData = async() => {
+  const saveData = async () => {
     //solo la mandare a llamar cuando logeen
-    if (codeValue) {
-      const jsonValue = JSON.stringify(codeValue);
-      await AsyncStorage.setItem('@UserKeys', jsonValue);
-      console.log('Datos Almacenados', codeValue);
-    } else {
-      alert('please fill data');
-    }
-  };
-
-  const getData = () => {
-    if (codeValue) {
-
-    }
+      //solo la mandare a llamar cuando logeen
+        let user = {
+          Code: codeValue,
+          Password: passwordValue,
+        };
+        await AsyncStorage.setItem('@UserKeys', JSON.stringify(user));
+        console.log('Datos Almacenados', {user});
+       
   };
   
+
+  const getData = () => {
+    try {
+      AsyncStorage.getItem('@UserKeys').then(value => {
+        if (value != null) {
+          let user = JSON.parse(value);
+          setcodeValue(user.Code);
+          setpasswordValue(user.Password);
+        }
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+ 
 
   const btnLogin = () => {
     var xhttp = new XMLHttpRequest();
@@ -93,7 +108,6 @@ const Login = ({navigation}) => {
     );
     xhttp.send();
   };
- 
 
   //lo que se ve
   return (
@@ -144,18 +158,11 @@ const Login = ({navigation}) => {
               btnRegister();
             }}
           />
-          <Btn
-            text="Recuperame"
-            onPress={() => {
-              getData();
-            }}
-          />
         </View>
       </ImageBackground>
     </View>
-    
   );
-
+  
   
 };
 const styles = StyleSheet.create({
