@@ -1,6 +1,6 @@
-import React, {Component, useState} from 'react';
-import {NavigationContext} from '@react-navigation/native';
-import {Avatar, Tile} from 'react-native-elements';
+import React, { Component, useState } from 'react';
+import { NavigationContext } from '@react-navigation/native';
+import { Avatar, Tile } from 'react-native-elements';
 import MenuDrawer from 'react-native-side-drawer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -14,7 +14,7 @@ import {
   TouchableOpacity,
   TextInput,
 } from 'react-native';
-import {Input, Icon, Button, Picker, Image, Card} from 'react-native-elements';
+import { Input, Icon, Button, Picker, Image, Card } from 'react-native-elements';
 
 export default class Main extends Component {
   constructor(props) {
@@ -28,13 +28,17 @@ export default class Main extends Component {
       Avatar:
         'https://i.pinimg.com/736x/cd/aa/03/cdaa035a2e82532857070e0007d977a6.jpg',
       km: 0,
+      codigo:0,
       Corredores: [],
     };
   }
 
   //drawwer!!
   toggleOpen = () => {
-    this.setState({open: !this.state.open});
+    this.setState({ open: !this.state.open });
+  };
+  gotodrawer = () => {
+    this.props.navigation.navigate("Mapa", { pasarCode: this.state.codigo });
   };
 
   drawerContent = () => {
@@ -55,8 +59,10 @@ export default class Main extends Component {
           <Text style={styles.Info}>{this.state.IdP}</Text>
           <Text style={styles.Info}>{this.state.centroP}</Text>
           <Text style={styles.Info}>{this.state.num_participantes}</Text>
+
+
         </View>
-      </TouchableOpacity>
+      </TouchableOpacity >
     );
   };
   //fin del drawer!!
@@ -95,7 +101,7 @@ export default class Main extends Component {
           animationTime={250}
           overlay={true}
           opacity={0.4}>
-       
+
           <Tile
             imageSrc={require('../Imagenes/background.png')}
             title="Participantes"
@@ -103,9 +109,13 @@ export default class Main extends Component {
             caption={this.state.num_participantes}
             height={200}
           />
-            
-           
-          <TouchableOpacity onPress={this.toggleOpen} style={styles.body}>
+
+
+
+
+
+
+          <TouchableOpacity onPress={this.gotodrawer} style={styles.body}>
             <Icon name="navicon" type="evilicon" color="white" />
           </TouchableOpacity>
 
@@ -113,6 +123,7 @@ export default class Main extends Component {
             <Card.Title style={styles.cardtitle}>Leaderboard</Card.Title>
           </Card>
 
+         
           {this.state.Corredores.map((u, i) => {
             if (i < 3) {
               return (
@@ -120,19 +131,20 @@ export default class Main extends Component {
                   <Avatar
                     size={69}
                     rounded
-                    source={{uri: u.Photo}}
+                    source={{ uri: u.Photo }}
                     containerStyle={styles.midAvatar}
                   />
                   <Text style={styles.Infocard}>{u.Code}</Text>
-                  <Text style={styles.Infocard}>Km: {u.Distance}</Text>
+                  <Text style={styles.Infocard}>M: {u.Distance}</Text>
                   <Text style={styles.Infocard}>Hrs: {u.Time}</Text>
                   <Text style={styles.contador}>{i + 1}</Text>
                 </View>
               );
             }
           })}
+           <TouchableOpacity style={{backgroundColor:"white"}} onPress={this.gotodrawer}></TouchableOpacity>
         </MenuDrawer>
-      </View>
+      </View >
     );
   }
   // Funciones
@@ -151,11 +163,13 @@ export default class Main extends Component {
               var Datos = xhttp.responseText;
               //console.log(Datos);
               var arr = Datos.split(',');
-              _this.setState({NombreP: arr[0]});
-              _this.setState({IdP: arr[1]});
-              _this.setState({centroP: arr[0]});
-              _this.setState({num_participantes: arr[3]});
-              _this.setState({Avatar: arr[4]});
+              _this.setState({ NombreP: arr[0] });
+              _this.setState({ IdP: arr[1] });
+              _this.setState({ centroP: arr[0] });
+              _this.setState({ num_participantes: arr[3] });
+              _this.setState({ Avatar: arr[4] });
+              _this.setState({codigo:user.Code});
+
             }
           };
 
@@ -184,7 +198,7 @@ ORDER BY `puntos`  DESC */
     xhttp2.onreadystatechange = function () {
       if (this.readyState == 4 && this.status == 200) {
         console.log('entra');
-        _this.setState({Corredores: JSON.parse(xhttp2.responseText)});
+        _this.setState({ Corredores: JSON.parse(xhttp2.responseText) });
       }
     };
     xhttp2.open('GET', 'https://spoiledragon.000webhostapp.com/Table.php');
@@ -251,12 +265,12 @@ const styles = StyleSheet.create({
   Infocard: {
     color: '#fff',
     fontSize: 15,
-   marginHorizontal:20,
+    marginHorizontal: 20,
     letterSpacing: 1,
   },
   contador: {
     fontSize: 40,
-    textAlign:"right",
+    textAlign: "right",
     color: '#eda137',
   },
   bottom: {
