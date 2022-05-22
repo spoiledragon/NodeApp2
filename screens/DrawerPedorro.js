@@ -38,7 +38,7 @@ export default class Main extends Component {
     this.setState({ open: !this.state.open });
   };
   gotodrawer = () => {
-    this.props.navigation.navigate("Mapa", { pasarCode: this.state.codigo });
+    this.props.navigation.navigate("Mapa", { pasarCode: this.state.codigo});
   };
 
   drawerContent = () => {

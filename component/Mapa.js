@@ -7,6 +7,7 @@ import { lineString as makeLineString } from '@turf/helpers';
 
 
 import { Button } from 'react-native-elements';
+import { min } from 'react-native-reanimated';
 MapboxGL.setAccessToken(
   'sk.eyJ1Ijoic3BvaWxlZHJhZ29uIiwiYSI6ImNsMm90eGliMjAwMGEzZW8zajFydWJmaGEifQ.0dEUyjBc5gk24dAoA6fk3A',
 );
@@ -16,6 +17,7 @@ export default class Mapa extends Component {
 
     this.state = {
       kilometros: 0,
+      tiempo: 0,
       codigo: this.props.route.params.pasarCode,
       recordedPath: [],
       currentPoint: null,
@@ -24,13 +26,20 @@ export default class Mapa extends Component {
       started: false,
       on_start: false,
       complete: false,
+      time_start: new Date(),
+      time_end: new Date(),
+      recorrido: 0,
     };
     console.log(this.state.codigo);
+    console.log(this.state.time_start);
   }
 
 
 
   onUserLocationUpdate = (e) => {
+
+    //Tomar tiempo
+
     const { longitude, latitude } = e.coords;
     this.setState({
       currentPoint: [longitude, latitude],
@@ -46,9 +55,8 @@ export default class Mapa extends Component {
       this.setState({ complete: true });
       this.setState({ on_start: false });
       this.setState({ endpoint: this.state.currentPoint });
+
       console.log(this.state.endpoint);
-
-
 
       const R = 6371e3; // metres
       const φ1 = this.state.beginpoint[1] * Math.PI / 180; // φ, λ in radians
@@ -60,9 +68,21 @@ export default class Mapa extends Component {
         Math.cos(φ1) * Math.cos(φ2) *
         Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
+      //total de la distancia
       const d = R * c; // in metres
-      console.log("Metros Recorridos",d)
+      console.log("Metros Recorridos", d)
+
+      let totalrecorrido = d + this.state.kilometros;
+      console.log("se recorrido totalmente esto", totalrecorrido);
+
+      this.setState({ recorrido: totalrecorrido });
+      this.setState({ kilometros: totalrecorrido });
+      console.log(this.state.recorrido);
+
+      this.enviar();
+
+
+
     }
 
     //console.log(JSON.stringify(e))
@@ -115,8 +135,14 @@ export default class Mapa extends Component {
     xhttp.onreadystatechange = function () {
       if (this.readyState == 4 && this.status == 200) {
         // Typical action to be performed when the document is ready:
-        _this.setState({ kilometros: xhttp.responseText });
-        console.log(_this.state.kilometros);
+        var Datos = JSON.parse(xhttp.responseText);
+        _this.setState({ kilometros: Datos[0].Kilometros * 100 });
+        _this.setState({ tiempo: Datos[0].Time });
+        //console.log("Km",Datos[0].Kilometros);
+        //_this.setState({kilometros:Datos.Kilometros});
+        console.log("M", _this.state.kilometros);
+        console.log("time", _this.state.tiempo);
+
       }
     };
     xhttp.open(
@@ -131,15 +157,67 @@ export default class Mapa extends Component {
 
   }
 
-  botonsito = () => {
+  async enviar() {
+    var xhttp = new XMLHttpRequest();
+    let _this = this;
+    xhttp.onreadystatechange = function () {
+      if (this.readyState == 4 && this.status == 200) {
+        // Typical action to be performed when the document is ready:
+        var Datos = JSON.parse(xhttp.responseText);
+        console.log(Datos);
+      }
+    };
+    let esto = 'https://spoiledragon.000webhostapp.com/editar_corredor.php?codigo=' + _this.state.codigo + '&time=' + _this.state.tiempo + '&distance=' + _this.state.recorrido;
+    xhttp.open(
+      'GET',
+      esto,
+      true,
+    );
+    xhttp.send();
+    console.log(esto);
+  }
 
-    if (this.state.started == true) {
-      this.setState({ started: false });
-      console.log("se ha Detenido");
-    } else {
+  botonsito = () => {
+    if (this.state.started == false) {
       this.setState({ started: true });
-      console.log("se ha ha Iniciado");
+      console.log("se ha Iniciado");
+      this.setState({ time_end: new Date() });
+      console.log("comenzaste con ", this.state.kilometros);
+
+    } else {
+
+      this.setState({ started: false });
+      console.log("se ha ha Finalizado");
+      this.setState({ time_start: new Date() });
+      //console.log(this.state.time_start);
+
+      var fechaHora = new Date(this.state.time_start);
+
+      var minutos = fechaHora.getMinutes();
+
+      //console.log("Inicio", horas, minutos, segundos);
+
+      var fechaHora2 = new Date(this.state.time_end);
+
+      var minutos2 = fechaHora2.getMinutes();
+
+      //console.log("Fin", horas2, minutos2, segundos2);
+
+      //console.log(fechaHora2 - fechaHora);
+      var minutostrans=(fechaHora2 - fechaHora)/6000;
+      console.log(minutostrans);
+      var total = this.state.tiempo + minutostrans;
+      
+      console.log("Total", total);
+      this.setState({ tiempo: total });
+
+
+
+
+
     }
+
+
   }
   render() {
 
@@ -219,10 +297,10 @@ export default class Mapa extends Component {
               rotation={-90}
               size={120}
               width={15}
-              fill={this.state.kilometros}
+              fill={this.state.kilometros / 100}
               tintColor="#00e0ff"
               backgroundColor="#3d5875">
-              {fill => <Text style={{ color: "black" }}>{this.state.kilometros / 10}  / 10 km</Text>}
+              {fill => <Text style={{ color: "black" }}>{this.state.kilometros / 1000}  / 10000 m</Text>}
             </AnimatedCircularProgress>
           </View>
           <View style={{ marginTop: -100, marginLeft: 50 }}>
@@ -231,15 +309,15 @@ export default class Mapa extends Component {
               rotation={-90}
               size={120}
               width={15}
-              fill={50}
+              fill={this.state.tiempo/60}
               tintColor="#00e0ff"
               backgroundColor="#3d5875">
-              {fill => <Text style={{ color: "black" }}>3 dias / 5 dias</Text>}
+              {fill => <Text style={{ color: "black" }}>{this.state.tiempo} Min</Text>}
             </AnimatedCircularProgress>
           </View>
         </View>
         <Button title={'Ruta'} onPress={this.botonsito} />
-        <Button title={'Refresh'} onPress={requestCameraPermission} />
+        {/*   <Button title={'Refresh'} onPress={requestCameraPermission} />  */}
       </View>
     );
   }
